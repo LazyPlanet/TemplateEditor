@@ -1,0 +1,641 @@
+//----------------------------------------------------------------------------------------------------
+//  使用帮助:
+//  
+//	1.增加新的配置项
+//
+//	(1) 在CONFIG_TYPE中增加枚举值，同时指定该配置项的type_t的默认值为该枚举值;
+//
+//	(2) 必须含有变量:
+//
+//		optional CONFIG_TYPE type_t = 1 [ default = CONFIG_PLANT ];
+//
+//		required int32 index = 2;
+//
+//		required Version version = 3;
+//	
+//	(3) 新增字段，索引必须增加，不能改变之前顺序，否则策划自行根据字段顺序调整CSV文件数据;
+//
+//	(4) 新增字段，按照顺序递增，双击编辑器中message，打开后导出到CSV文件，然后编辑;
+//
+//	2.repeated项使用注意
+//
+//	(1) repeated变量前索引需要定义成xx_count，指定大小;
+//
+//	(2) repeated中的类型如果是message，则不建议写成嵌套形式，需单独拿出来;
+//
+//	3.使用建议
+//	
+//	(1) 策划所提的表格中的中文，写到message中对应字段的注释;
+//
+//	(2) 理论上支持任意多嵌套，但为策划配置方便和显示，建议最多两层嵌套;
+//
+//	(3) 为了便于查看，每个列宽当前为100单位长度，系统限制为65535单位长度，所以嵌套长度不建议超过600，超过则建议外键形式解决;
+//	
+//	(4) 一个配置项引用其他配置项，尽可能使用外键关联，而非直接定义变量的方式，会增加客户端存储负担;
+//
+//	4.策划数据配置
+//	
+//	(1) 对于version字段，当前条件下一律填写GLOBAL，其他海外版本暂时不用填写;
+//
+//	(2) 含有repeated字段的前面的xx_count要填写程序默认的default值，也就是说，策划定义数组的默认长度值; 如果填写小于default的值，则表示该数组只用到该数值的长度，而非全部;
+//	
+//	5.多版本问题
+//
+//	(1) 海外和大陆版本的某个配置不同时，则复制一行且将该行的GLOBAL改成DALU，新配置行版本改成对应版本号即可;
+//
+//	说明：不建议在分支版本修改数据，优先选择在主干版本修改数据后同步到各个分支。
+// 
+//	6.本地化问题
+//	
+//	(1) 客户端只会导出对应版本的数据，同其他脚本一致，实现本地化功能，所有的文字填写中文即可;
+//	
+//	7.后期版本优化方向
+//
+//	(1) CONFIG_TYPE的导出选择：只导出客户端，只导出服务器，都导出;
+//	
+//	(2) 对比客户端导出LUA和导出二进制文件占用内存，确定最终方案;
+//	
+// 	(3) 支持物品配置;
+//
+//
+//	模板范例: message Forge
+//
+//	问题&建议: RTX:zhenyunheng     Email:zhenyunheng@zulong.com
+//----------------------------------------------------------------------------------------------------
+
+package PB;
+
+//模板数据地区版本
+enum Version {
+	GLOBAL 		= 0x00000001;
+	DALU 		= 0x00000002;
+	TAIWAN 		= 0x00000004;
+	HANGUO 		= 0x00000008;
+	DONGNANYA 	= 0x00000010;
+}
+
+//模板类别
+enum CONFIG_TYPE {
+	CONFIG_PLANT 			= 1;	//种植
+	CONFIG_FORGE 			= 2;	//打造
+	CONFIG_TID			= 3;	//特殊ID表
+	CONFIG_CORPS_SKILLROOM		= 4;	//帮派练功房
+	CONFIG_CORPS_TALENT		= 5;	//帮派天赋
+	CONFIG_WORLD_WAR		= 6;	//世界大战
+	CONFIG_WWAR_TERRITORY		= 7;
+	CONFIG_FAHION_COLOR		= 8;	//时装染色
+	CONFIG_SUITE_ADDON		= 9;	//套装属性
+	CONFIG_ACHIEVEMENT_REWARD	= 10;	//成就扩展奖励
+	CONFIG_NATION			= 11;	//国家配置
+	CONFIG_PROFESSION		= 12;	//国家配置
+	CONFIG_CARD_WEIGHT		= 13;	//卡牌在各个位置权重
+	CONFIG_CARD_BATTLE_PHASE	= 14; 	//卡牌对决阶段
+	CONFIG_WWAR_TERRITORY_GROUP	= 15;
+	CONFIG_WWAR_REWARD		= 16;	//世界大战奖励
+	CONFIG_CARD_BATTLE_SPECIAL	= 17;	//卡牌对决
+	CONFIG_DUKE_PASSIVE_SKILL_GROUP = 18;	//爵位被动技能组
+	CONFIG_STATUE			= 19;	//雕像
+	CONFIG_COMMON_COST_LIMIT	= 20;	//通用消耗限制
+	CONFIG_NPC_STATUE_SERVICE	= 21;	//NPC雕像服务
+	CONFIG_GENERAL_COST		= 22;	//通用消耗
+	CONFIG_GMT_COMMAND		= 23;	//GMT指令
+	CONFIG_NEW_TOPLIST		= 24;	//新全游戏排行榜
+	CONFIG_CLAN_RWARD		= 25;	//战队奖励
+} 
+
+
+enum GMT_INDEX
+{
+	GMT_INDEX_REFORGE 			= 10000; //装备重铸
+	GMT_INDEX_FORGE	  			= 10001; //装备打造
+	GMT_INDEX_PROPERTY_PILL 		= 10002; //属性丹
+	GMT_INDEX_DUKE_UPGRADE_PASSIVE_SKILL	= 10003; //爵位升级被动技能
+	GMT_INDEX_STATUE_SERVICE		= 10004; //雕像服务
+}
+
+
+//特殊ID表
+message TID {	
+	optional CONFIG_TYPE type_t		= 1 [ default = CONFIG_TID ];
+	required int32 index			= 2;
+	required Version version		= 3;
+	optional int32 corps_talen		= 4;
+	optional int32 prof_cfgs_count		= 5 [ default = 32 ];
+	repeated int32 prof_cfgs		= 6;
+	optional int32 clan_reward		= 7;
+}
+//材料
+message Material {
+	optional int32 material_tid 		= 1;	//消耗材料ID
+	optional int32 material_count 		= 2;	//消耗材料数量
+}
+
+//声望
+message Reputation {
+	optional int32 reputation_index		= 1;	
+	optional int32 reputation_value		= 2;	
+}
+
+//打造
+message Forge {
+	optional CONFIG_TYPE type_t		= 1 [ default = CONFIG_FORGE ]; 	//模板项
+	required int32 index			= 2;					//模板ID
+	required Version version		= 3;					//版本
+	optional string name 			= 4;					//模板名
+	optional int32 category 		= 5;					//类别 1 神器，2 马具，3 灵兵
+	optional int32 product_tid		= 6;					//产物ID
+	optional int32 product_count		= 7;					//产物数量
+	optional int32 product_show_tid		= 8;					//显示用产物ID 若填则显示此ID相应的图标及物品说明
+	optional int32 cost_money		= 9;					//消耗金钱	
+	optional int32 materials_count		= 10 [ default = 4 ];			//材料个数(Material大小)
+	repeated Material materials		= 11;
+}
+//帮会天赋的显示信息
+message CorpsTalentShow {
+	optional string name			= 1;	//名称
+	optional int32 icon			= 2;	//图标
+	optional string describe		= 3;	//描述
+	optional int32 talent_config_tid	= 4;	//帮会天赋配置tid
+} 
+//帮会练功房
+message CorpsSkillRoom {
+	optional CONFIG_TYPE type_t		= 1 [ default = CONFIG_CORPS_SKILLROOM ];
+	required int32 index			= 2;
+	required Version version		= 3;
+	optional int32 talentshow_count		= 4 [ default = 8 ];
+	repeated CorpsTalentShow talentshow	= 5;	//每个天赋配置
+}
+//帮会天赋的等级信息
+message CorpsTalentLevel {
+	optional int32 need_skill_room_level	= 1;	//需要练功房等级
+	optional int32 need_contribute		= 2;	//需要消耗的帮贡
+	optional int32 addon_id			= 3;	//对应附加属性id
+}
+//帮会天赋
+message CorpsTalent {
+	optional CONFIG_TYPE type_t		= 1 [ default = CONFIG_CORPS_TALENT ];
+	required int32 index			= 2;
+	required Version version		= 3;
+	optional int32 levelConfig_count	= 4 [ default = 100 ];
+	repeated CorpsTalentLevel levelConfig	= 5;	//每个等级的配置
+}
+//随机颜色信息
+message FashionRandomColor {
+	optional int32  color_index		= 1;			//对应客户端颜色表里颜色id
+	optional int32  color_weight		= 2;			//权重
+	optional int32 	pre_cnt			= 3;			//解锁此颜色需要开启的颜色数量
+}
+//时装染色
+message FashionColor {
+	optional CONFIG_TYPE type_t		= 1 [ default = CONFIG_FAHION_COLOR ];
+	required int32 index			= 2;
+	required Version version		= 3;
+	optional int32 unlock_item_id		= 4;			//解锁消耗物品id 
+	optional int32 unlock_item_cnt		= 5;			//解锁消耗物品数量
+	optional int32 colorate_item_id		= 6;			//染色消耗物品id
+	optional int32 colorate_item_cnt 	= 7;			//染色消耗物品数量
+	optional int32 colors_count		= 8 [default = 20]; 	//颜色数量
+	repeated FashionRandomColor colors	= 9;
+}
+//世界大战相关配置
+message WorldWar {	
+	optional CONFIG_TYPE type_t		= 1 [ default = CONFIG_WORLD_WAR ];
+	required int32 index			= 2;
+	required Version version		= 3;
+	optional int32 open_days		= 4;	//服务器开放后几天开启
+	optional int32 level_limit		= 5;	//玩家参与等级
+	optional uint32 offical_limit		= 6;	//宣战权限mask
+	optional int32 safe_time_count		= 7 [default = 3];
+	repeated int32 safe_time		= 8;	//领土数n安全时间
+	optional int32 inst_tid_count		= 9 [default = 7];
+	repeated int32 inst_tid			= 10;	//周X对应副本[1-7]
+	message wwar_level {
+		optional int32 icon	= 1;
+		optional int32 repu	= 2;
+		optional int32 reward	= 3;
+		optional string name 	= 4; //段位名
+	};
+	optional int32 wwar_levels_count	= 11 [ default = 10 ];
+	repeated wwar_level wwar_levels		= 12;
+	optional int32 first_award		= 14;			//首次参与奖励，通用奖励模板
+	optional int32 init_morale_repu	 	= 15;	//初始战意值
+	optional int32 morale_repu_per_day	= 16;	//每日战意值恢复
+	optional int32 declare_activity_index	= 17;	//宣战活动index
+	optional int32 declare_activity_tid	= 18;	//宣战活动tid
+	optional int32 alliance_activity_index	= 19;	//结盟
+	optional int32 alliance_activity_tid	= 20;
+	optional int32 wwar_activity_index	= 21;	//开战
+	optional int32 wwar_activity_tid	= 22;
+	optional int32 max_declare_cost		= 23;	//宣战最高金额上限
+	optional int32 pve_inst_tid		= 24;	//pve副本tid
+	optional int32 no_owner_inst_tid	= 25;	//无主领土副本tid
+	//optional int32 world_war_active_day	= 26;	//世界大战在服务器开启n天后激活
+	message season_config {
+		optional bytes name		= 1;
+		optional int32 start_month 	= 2;
+		optional int32 start_day	= 3;	//几月几日开启
+		optional int32 life_time	= 4;	//持续时间
+		optional int32 backup_toplist_count = 5 [default = 4];
+		repeated int32 backup_toplist	= 6;	//关联的排行榜,赛季结束清空,生成老榜
+	};
+	optional int32 season_count		= 27 [ default = 10 ];
+	repeated season_config season		= 28;	//赛季配置
+}
+
+//世界大战领土相关配置
+message WWarTerritory {	
+	optional CONFIG_TYPE type_t		= 1 [ default = CONFIG_WWAR_TERRITORY ];
+	required int32 index			= 2;
+	required Version version		= 3;
+	optional string name			= 4;	//领土名称
+	optional string brief_desc		= 5;	//简介
+	optional int32 position_typea		= 6 [ default = 1 ];	//1=非登陆、2=登陆
+	optional int32 attack_type		= 7 [ default = 1 ];	//1=可争夺、2=NPC领土
+	optional int32 level_type		= 8 [ default = 1 ];	//-1=城市、2=首都
+	optional int32 special_type_weight	= 9 [ default = 10 ];	//随机福利据点权重
+	optional int32 near_territory_count	= 10 [ default = 6 ];	//接壤领土
+	repeated int32 near_territory		= 11;			//接壤领土
+	optional int32 reward_title		= 12;			//首都称号奖励
+	optional uint32 declare_nation_money 	= 13;			//宣战基础国库资金
+	optional uint32 declare_nation_power	= 14;			//宣战基础战意
+	optional uint32 expedition_nation_power	= 15;			//远征消耗战意
+	optional int32 wward_reward_tid		= 16;			//使用的战争奖励模板
+}
+//领土战奖励模板
+message WWarReward {
+	optional CONFIG_TYPE type_t		= 1 [ default = CONFIG_WWAR_REWARD ];
+	required int32 index			= 2;
+	required Version version		= 3;
+	optional int32 day_reward_id		= 4;	//每日产出威望（需可发放国家声望）
+	optional int32 win_reward_id 		= 5;	//战斗胜利奖励
+	optional int32 lose_reward_id		= 6;	//战斗失败奖励
+	optional int32 alleywin_reward_id	= 7;	//联盟胜利奖励
+	optional int32 alleylose_reward_id	= 8;	//联盟失败奖励
+	optional int32 emptywin_reward_id	= 9;	//空城胜利奖励（即开荒奖励）
+	optional int32 emptylose_reward_id	= 10;	//空城失败奖励
+	message npc_rank_reward {
+		optional int32 rank	= 1;
+		optional int32 reward	= 2;
+		optional int32 nation_repu = 3;
+	}
+	optional int32 rank_reward_count	= 11 [ default = 20 ];
+	repeated npc_rank_reward rank_reward	= 12;
+	optional int32 win_nation_repu		= 13;
+	optional int32 lose_nation_repu		= 14;
+	optional int32 alleywin_nation_repu	= 15;
+	optional int32 alleylose_nation_repu	= 16;
+	optional int32 emptywin_nation_repu	= 17;
+	optional int32 emptylose_nation_repu	= 18;
+
+}
+
+message TerritoryGroup {
+	optional CONFIG_TYPE type_t		= 1 [ default = CONFIG_WWAR_TERRITORY_GROUP ];
+	required int32 index			= 2;
+	required Version version		= 3;
+	optional int32 terriories_count		= 4 [default = 12];
+	repeated int32 terriories		= 5;	//所有领地
+	optional int32 special_num_min 		= 6;	//小组内最少随机福利数量
+	optional int32 special_num_max 		= 7;	//小组内最多随机福利数量
+	message special_cfg {
+		optional int32 type	= 1;	//1(好战分子)、2(安居乐业)、3(开疆扩土)、4(幸运降临)对应不同的随机福利种类
+		optional int32 icon	= 2;	//随机福利图标
+		optional float param	= 3;	//随机福利参数
+		optional int32 weight	= 4;	//从多个随机福利中随机到该种的权重
+	}
+	optional int32 specail_cfgs_count	= 8 [ default = 4];
+	repeated special_cfg specail_cfgs	= 9;
+}
+
+//套装额外
+message SuiteAddon {
+	optional CONFIG_TYPE type_t				= 1 [ default = CONFIG_SUITE_ADDON ];
+	required int32 index					= 2;
+	required Version version				= 3;
+	optional string name 					= 4; //模板名
+	optional string icon_path 				= 5; //模板名
+	enum SUITE_ADDON_TYPE
+	{
+		SUITE_ADDON_TYPE_GEM		= 1; //宝石
+		SUITE_ADDON_TYPE_LIANXING	= 2; //炼星
+	}
+	optional SUITE_ADDON_TYPE suite_addon_type 		= 6; //套装类型
+	message PropLimit	 {
+		optional int32 param 	= 1; //特定参数
+		optional int32 addon_id = 2; //附加属性组ID
+	}
+	optional int32 prop_limits_count 			= 7 [ default = 16 ]; //属性限制配置数量
+	repeated PropLimit prop_limits				= 8; 
+}
+
+//成就扩展奖励
+message AchievementReward {
+	optional CONFIG_TYPE type_t			= 1 [ default = CONFIG_ACHIEVEMENT_REWARD ];
+	required int32 index				= 2;
+	required Version version			= 3;
+	optional bytes config_name			= 4;
+	optional int32 level_limit			= 5;
+	optional int32 reward_tid			= 6;
+	message achievement_group {
+		optional int32 achievement_tid_count	= 1 [ default = 8 ];
+		repeated int32 achievement_tid		= 2;
+	}
+	optional int32 agroup_count			= 7 [ default = 6];
+	repeated achievement_group agroup		= 8;
+}
+
+//卡牌对决阶段开启条件
+message CardBattleOpenCondition{
+	enum CONDITION_TYPE{
+		ACTIVE_SUIT   = 1;
+		FINISH_BATTLE = 2;
+	}
+	optional CONDITION_TYPE cond_type		= 1;
+	optional int32 param1				= 2;
+	optional int32 param2				= 3;
+}
+message CardBattleEffect{
+	optional int32 effect_type			= 1;
+	optional int32 param1				= 2;
+	optional int32 param2				= 3;
+	optional int32 self_effect_pathid		= 4;
+	optional int32 enemy_effect_pathid		= 5;
+}
+message CardWeight{
+	optional CONFIG_TYPE type_t			= 1 [ default = CONFIG_CARD_WEIGHT ];
+	required int32 index				= 2;
+	required Version version			= 3;
+	optional int32 card_id				= 4;
+	optional int32 weight_count			= 5 [default = 4];
+	repeated int32 weight				= 6;
+}
+//卡牌对决阶段
+message CardBattlePhase{
+	optional CONFIG_TYPE type_t			= 1 [ default = CONFIG_CARD_BATTLE_PHASE ];
+	required int32 index				= 2;
+	required Version version			= 3;
+	optional int32 conditions_count			= 4 [ default = 3 ];
+	repeated CardBattleOpenCondition conditions	= 5;			//开启条件
+	optional int32 effects_count			= 6 [ default = 5 ];
+	repeated CardBattleEffect effects		= 7;			//npc特殊效果
+	optional int32 ticket				= 8;			//需要消耗门票
+	optional int32 npc_card_count			= 9 [ default = 100 ];	
+	repeated int32 npc_card				= 10;			//对应CardWeight里面的index
+	optional int32 player_card_count		= 11 [ default = 100 ];
+	repeated int32 player_card 			= 12;			//玩家在此对决阶段可用卡牌
+}
+//开牌对决特殊id配置
+message CardBattleSpecialConfig{
+	optional CONFIG_TYPE type_t			= 1 [ default = CONFIG_CARD_BATTLE_SPECIAL ];
+	required int32 index				= 2;
+	required Version version			= 3;
+	optional int32 diamond_for_restart		= 4; //重新开局花费钻石
+	optional int32 vip_ticket_upperbound		= 5; //门票上限VIP序列
+	optional int32 ticket_renew_interval		= 6; //门票恢复间隔(s)
+	optional int32 ticket_renew_count		= 7; //单次恢复数量
+	optional int32 ticket_use_limit			= 8; //门票购买公用使用限制ID
+	optional int32 win_steak_count			= 9; //连胜要求次数
+	optional int32 win_steak_reward_param		= 10; //连胜奖励参数
+}
+
+//国家配置
+message NationInfo {
+	optional CONFIG_TYPE type_t			= 1 [ default = CONFIG_NATION ];
+	required int32 index				= 2; //国家id(1-6)
+	required Version version			= 3;
+	optional bytes name					= 4; //国家名字
+	optional int32 logo					= 5; //国家logo
+}
+
+//职业配置
+message ProfConfig {
+	optional CONFIG_TYPE type_t			= 1 [ default = CONFIG_PROFESSION ];
+	required int32 index				= 2;
+	required Version version			= 3;
+	optional int32 seq				= 4; //职业序号
+	optional bytes name				= 5; //职业名
+	optional int32 prof_icon			= 6; //职业图标
+
+	message show_info {
+		optional int32 head_icon		= 1; //头像
+		optional int32 model_id			= 2; //模型
+		optional int32 model_fx_id		= 3; //模型演武特效
+	}
+
+	optional show_info male 			= 7; //男性显示信息
+	optional show_info female			= 8; //女性显示信息
+
+	optional int32 skillID_count			= 9 [ default = 10 ];
+	repeated int32 skillID				= 10;	//职业初始技能
+	optional int32 mask				= 11;	//可转成该职业的职业mask
+	optional int32 cost_item_id			= 12;	//消耗物品id
+	optional int32 cost_item_count			= 13;	//消耗物品数量
+	optional int32 lv_limit				= 14;	//等级限制
+	optional int32 fighting_limit			= 15;	//战斗力限制
+	optional int32 fx_effect_id 			= 16;	//职业头像特效路径ID
+	optional int32 property_id			= 17;	//职业属性头像路径ID
+	optional bytes prof_desc			= 18; 	//职业描述
+}
+
+//爵位被动技能组配置
+message DukePassiveSkillGroup
+{
+	message Upgrade
+	{
+		optional int32 cost_money      = 1; //消耗金钱
+		optional int32 cost_repu_id    = 2; //消耗声望ID
+		optional int32 cost_repu_val   = 3; //消耗声望数值
+		optional int32 cost_item_id    = 4; //消耗物品id
+		optional int32 cost_item_count = 5; //消耗物品数量
+		optional int32 addon_id        = 6; //附加属性组ID
+	}
+	optional CONFIG_TYPE 	 type_t			= 1 [ default = CONFIG_DUKE_PASSIVE_SKILL_GROUP ];
+	required int32 		 index			= 2; //ID
+	required Version 	 version		= 3; //版本
+	optional string 	 name 			= 4; //组名
+	optional int32 		 icon_path 		= 5; //组显示图标
+	optional string 	 description 		= 6; //属性描述
+	optional int32 		 upgrades_count 	= 7 [ default = 20 ];
+	repeated Upgrade 	 upgrades 		= 8; //升级配置
+}
+
+//雕像配置
+message Statue
+{
+	message SimpleCron
+	{
+		optional int32 min		= 1[default=0]; //0 - 59, 对应0分至59分
+		optional int32 hour		= 2[default=0]; //0 - 23, 对应0点到23点
+		optional int32 day_of_week	= 3; //1 - 7, 对应周一到周日, 0表示忽略
+		optional int32 day_of_month	= 4; //1 - 28, 对应1号到28号, 0表示忽略
+	}
+
+	optional CONFIG_TYPE type_t			 = 1 [ default = CONFIG_STATUE ];
+	required int32		 index			 = 2; //ID
+	required Version	 version		 = 3; //版本
+	optional int32		 toplist_tid		 = 4; //排行榜ID
+	optional int32       	 toplist_nation		 = 5; //如果是国家排行榜,填写国家ID
+	optional int32		 toplist_rank		 = 6; //排行榜第n名
+	optional int32		 nation_officer		 = 7; //国家官职
+	optional int32		 id_other_statue_service = 8; //他人雕像服务
+	optional int32		 id_self_statue_service	 = 9; //本人雕像服务
+	optional string		 name			 = 10; //名字
+	optional string		 title			 = 11;  //称谓
+	optional string		 hello_msg		 = 12; //开场白
+	optional SimpleCron	 cron			 = 13; //定时刷新
+	optional float		 scale			 = 14; //模型显示比例
+	optional float		 title_pos		 = 15; //头顶名称位置
+
+}
+
+
+//通用消耗限制：递增消耗
+message CommonCostLimit
+{
+	message OneCost
+	{
+		optional int32	item_tid   	= 1; //道具TID
+		optional int32	item_count 	= 2; //道具数量
+		optional int32	money	   	= 3; //金钱
+		optional int32  repu_id	   	= 4; //声望id
+		optional int32  repu_val   	= 5; //声望值
+		optional int32  diamond_mix  	= 6; //混合钻石(该条件与非绑定钻石条件互斥)
+		optional int32  diamond_unbind 	= 7; //非绑定钻石
+	}
+
+	optional CONFIG_TYPE 	 type_t		= 1 [ default = CONFIG_COMMON_COST_LIMIT ];
+	required int32		 index		= 2; //ID
+	required Version	 version	= 3; //版本
+	optional int32		 costs_count	= 4 [ default = 20 ];
+	repeated OneCost	 costs		= 5; //消耗
+}
+
+//NPC雕像服务
+message NPCStatueService
+{
+	optional CONFIG_TYPE 	 type_t		= 1 [ default = CONFIG_NPC_STATUE_SERVICE ];
+	required int32		 index		= 2; //ID
+	required Version	 version	= 3; //版本
+	enum WHO
+	{
+		WHO_SELF  = 1;
+		WHO_OTHER = 2;
+	}
+	message Kind {
+		optional int32	reward_id		= 1; //通用奖励ID
+		optional int32  statue_reward_repu_id	= 2; //给雕像奖励的声望ID
+		optional int32  statue_reward_repu_val	= 3; //给雕像奖励的声望值
+		optional int32  cost_limit_id		= 4; //通用消耗限制ID
+	}
+	optional WHO		who		= 4; //对谁
+	optional int32		use_limit_id	= 5; //通用限制ID
+	optional string		name		= 6; //服务名称
+	optional int32		kinds_count	= 7 [ default = 5 ];
+	repeated Kind		kinds		= 8; //服务种类
+}
+
+//通用消耗
+message GeneralCost {
+	
+	enum COST_TYPE {
+		COST_REFORGE = 1;	//重铸
+	}
+
+	optional CONFIG_TYPE type_t		= 1 [ default = CONFIG_GENERAL_COST ]; 	
+	required int32 index			= 2;					
+	required Version version		= 3;	//版本					
+	optional COST_TYPE cost_type		= 4;	//消耗类型
+	optional string name 			= 5;					
+	optional int32 materials_count		= 6 [ default = 3 ];		//物品	
+	repeated Material materials		= 7;
+	optional int32 reputations_count	= 8 [ default = 3 ];		//声望
+	repeated Reputation reputations		= 9;
+	optional int32 money			= 10;	//消耗金钱
+	optional int32 diamond_bind		= 11;	//消耗绑定钻石
+	optional int32 diamond_unbind		= 12;	//消耗非绑定钻石
+}
+
+//游戏功能控制，GMT指令
+message GmtCommand {	
+	optional CONFIG_TYPE type_t		= 1 [ default = CONFIG_GMT_COMMAND ];
+	required int32 index			= 2;
+	required Version version		= 3;
+	optional GMT_INDEX gmt_index		= 4;	//玩法索引，策划和程序对齐即可
+	optional int32 active			= 5 [ default = 1];	//是否开启功能
+	optional string description		= 6;	//功能描述
+}
+
+message NewTopList {
+	optional CONFIG_TYPE type_t			= 1 [ default = CONFIG_NEW_TOPLIST ];
+	required int32 index				= 2; //ID
+	required Version version			= 3; //版本
+	optional bytes name				= 4;
+	optional int32 type				= 5; //类型 0本服 1跨服
+	optional int32 activity_index			= 6; //活动index
+	optional int32 activity_tid			= 7;
+	enum TOPLIST_TYPE {
+		TT_FOREVER	= 0;	//永久性排行,可以用外部功能控制刷榜时机
+		TT_KAIFU	= 1;	//开服时间相关
+		TT_PER_WEEK	= 2;	//周备份老榜
+		TT_PER_MONTH	= 3;	//月备份老榜
+	};
+	optional TOPLIST_TYPE time_type			= 8;
+	optional int32 day_offset			= 9;	//备份老榜用时间点
+	optional int32 hour_offset			= 10;
+	optional int32 min_offset			= 11;
+	optional int32 weak_offset			= 12;
+	optional int32 frozen_time			= 13;	//备份后冻结时间
+	optional int32 max_item				= 14;
+	optional int32 total_time_can_reward		= 15;	//领奖持续时间
+	optional int32 clear_when_backup		= 16;	//备份时候清空排行
+
+	optional int32 rank_info_count			= 17 [ default = 10 ];
+	repeated string rank_info			= 18;
+	message reward_conf {
+		optional uint32 rank	= 1;
+		optional int32 reward	= 2;
+	}
+	optional int32 reward_info_count		= 19 [ default = 20 ];
+	repeated reward_conf reward_info		= 20;
+	enum TOPLIST_DAYA_TYPE {
+		TDT_ROLE_LEVEL		= 0;	//玩家等级  1 nation 2 prof
+		TDT_NATION_POWER	= 1;	//国家声望  1 king_roleid
+		TDT_WORLD_WAR		= 2;	//世界大战数据
+	};
+	optional TOPLIST_DAYA_TYPE data_type		= 21;	//咨询程序，程序会给出一个实现
+	optional int64 param1				= 22;	//不同类型对应的参数 0为没有设置
+	optional int64 param2				= 23;
+	optional int64 param3				= 24;
+}
+
+//战队奖励
+message ClanReward {
+	optional CONFIG_TYPE type_t			= 1 [ default = CONFIG_CLAN_RWARD ];
+	required int32 index				= 2; //ID
+	required Version version			= 3; //版本
+	optional string name				= 4; //配置名称
+	message Reward {
+		optional int32 value = 1; //参数达到值
+		optional int32 general_reward = 2; //通用奖励
+		optional int32 reward_limit = 3; //通用限制：领奖限次
+	}
+	optional int32 level_rewards_count		= 5 [ default = 10 ];
+	repeated Reward level_rewards			= 6;	//战队奖励
+	optional int32 companion_limit_perday		= 7;	//每日情谊值限制
+	optional int32 companion_rewards_count		= 8 [ default = 15 ];
+	repeated Reward companion_rewards		= 9;	//情谊树奖励
+	message GiftBag {
+		optional int32 comm_limit_tid = 1;	//战队礼包：通用限制ID，每人每日购买限次，如果只能选择一种，配置成相同
+		optional int32 comm_item_tid = 2;	//战队礼包：物品ID
+		optional int32 comm_cost_index = 3;	//战队礼包：通用消耗模板索引
+	}
+	optional int32 gift_bags_count			= 10 [ default = 3 ];
+	repeated GiftBag gift_bags			= 11;	//战队礼包
+	optional int32 level_limit			= 12;	//战队开启等级
+}
+
+//通用奖励类型
+enum GRANT_GENERAL_REWARD_TYPE
+{
+	GENERAL_REWARD_CLANS	= 200;	//战队奖励	
+}

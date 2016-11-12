@@ -1,0 +1,157 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{33B52564-E6D4-4314-A164-6249BE589D36}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>ReadFromBin</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>D:\TemplateTools\ReadFromBin\ReadFromBin;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>libprotobuf.lib;libprotoc.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:\TemplateTools\ReadFromBin\ReadFromBin\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <None Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ByteBuffer.h" />
+    <ClInclude Include="Define.h" />
+    <ClInclude Include="google\protobuf\compiler\code_generator.h" />
+    <ClInclude Include="google\protobuf\compiler\command_line_interface.h" />
+    <ClInclude Include="google\protobuf\compiler\cpp\cpp_generator.h" />
+    <ClInclude Include="google\protobuf\compiler\importer.h" />
+    <ClInclude Include="google\protobuf\compiler\java\java_generator.h" />
+    <ClInclude Include="google\protobuf\compiler\parser.h" />
+    <ClInclude Include="google\protobuf\compiler\plugin.h" />
+    <ClInclude Include="google\protobuf\compiler\plugin.pb.h" />
+    <ClInclude Include="google\protobuf\compiler\python\python_generator.h" />
+    <ClInclude Include="google\protobuf\descriptor.h" />
+    <ClInclude Include="google\protobuf\descriptor.pb.h" />
+    <ClInclude Include="google\protobuf\descriptor_database.h" />
+    <ClInclude Include="google\protobuf\dynamic_message.h" />
+    <ClInclude Include="google\protobuf\extension_set.h" />
+    <ClInclude Include="google\protobuf\generated_enum_reflection.h" />
+    <ClInclude Include="google\protobuf\generated_message_reflection.h" />
+    <ClInclude Include="google\protobuf\generated_message_util.h" />
+    <ClInclude Include="google\protobuf\io\coded_stream.h" />
+    <ClInclude Include="google\protobuf\io\gzip_stream.h" />
+    <ClInclude Include="google\protobuf\io\printer.h" />
+    <ClInclude Include="google\protobuf\io\tokenizer.h" />
+    <ClInclude Include="google\protobuf\io\zero_copy_stream.h" />
+    <ClInclude Include="google\protobuf\io\zero_copy_stream_impl.h" />
+    <ClInclude Include="google\protobuf\io\zero_copy_stream_impl_lite.h" />
+    <ClInclude Include="google\protobuf\message.h" />
+    <ClInclude Include="google\protobuf\message_lite.h" />
+    <ClInclude Include="google\protobuf\reflection_ops.h" />
+    <ClInclude Include="google\protobuf\repeated_field.h" />
+    <ClInclude Include="google\protobuf\service.h" />
+    <ClInclude Include="google\protobuf\stubs\atomicops.h" />
+    <ClInclude Include="google\protobuf\stubs\atomicops_internals_arm_gcc.h" />
+    <ClInclude Include="google\protobuf\stubs\atomicops_internals_arm_qnx.h" />
+    <ClInclude Include="google\protobuf\stubs\atomicops_internals_atomicword_compat.h" />
+    <ClInclude Include="google\protobuf\stubs\atomicops_internals_macosx.h" />
+    <ClInclude Include="google\protobuf\stubs\atomicops_internals_mips_gcc.h" />
+    <ClInclude Include="google\protobuf\stubs\atomicops_internals_pnacl.h" />
+    <ClInclude Include="google\protobuf\stubs\atomicops_internals_x86_gcc.h" />
+    <ClInclude Include="google\protobuf\stubs\atomicops_internals_x86_msvc.h" />
+    <ClInclude Include="google\protobuf\stubs\common.h" />
+    <ClInclude Include="google\protobuf\stubs\once.h" />
+    <ClInclude Include="google\protobuf\stubs\platform_macros.h" />
+    <ClInclude Include="google\protobuf\stubs\template_util.h" />
+    <ClInclude Include="google\protobuf\stubs\type_traits.h" />
+    <ClInclude Include="google\protobuf\text_format.h" />
+    <ClInclude Include="google\protobuf\unknown_field_set.h" />
+    <ClInclude Include="google\protobuf\wire_format.h" />
+    <ClInclude Include="google\protobuf\wire_format_lite.h" />
+    <ClInclude Include="google\protobuf\wire_format_lite_inl.h" />
+    <ClInclude Include="MessageBuffer.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ByteBuffer.cpp" />
+    <ClCompile Include="ReadFromBin.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="TemplateManager.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

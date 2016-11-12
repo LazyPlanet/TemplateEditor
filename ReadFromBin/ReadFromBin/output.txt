@@ -1,0 +1,6 @@
+D:\TemplateTools\TemplateData\Configuration\Plant
+D:\TemplateTools\TemplateData\Configuration\Plant.csv
+D:\TemplateTools\TemplateData\Configuration\Plant.tpk
+文件总数: 3
+子目录总数:0
+PB.Plant

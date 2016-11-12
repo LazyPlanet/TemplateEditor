@@ -1,0 +1,11 @@
+package Share_Common;
+
+message Item_Medichine {
+	optional Item_Type type_t = 1 [ default = Data_Item_Medichine ];
+	required uint32 TId = 2;
+	optional string name = 3;
+	optional uint32 cool_time = 4;
+	optional uint32 cool_type = 5;
+	optional int32 mode = 6;
+	optional int32 time = 7;
+}

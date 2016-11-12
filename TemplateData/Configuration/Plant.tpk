@@ -1,0 +1,66 @@
+type_t = Type_Plant
+index = 1
+version = DALU
+item_name = AA
+item_level = 1
+ripe_time = 2
+consume_diamonds = 3
+reward_tid = 4
+unlock_level = 5
+
+
+type_t = Type_Plant
+index = 2
+version = DALU
+item_name = AA
+item_level = 1
+ripe_time = 2
+consume_diamonds = 3
+reward_tid = 4
+unlock_level = 5
+
+
+type_t = Type_Plant
+index = 3
+version = DALU
+item_name = AA
+item_level = 1
+ripe_time = 2
+consume_diamonds = 3
+reward_tid = 4
+unlock_level = 5
+
+
+type_t = Type_Plant
+index = 4
+version = DALU
+item_name = AA
+item_level = 1
+ripe_time = 2
+consume_diamonds = 3
+reward_tid = 4
+unlock_level = 5
+
+
+type_t = Type_Plant
+index = 5
+version = DALU
+item_name = AA
+item_level = 1
+ripe_time = 2
+consume_diamonds = 3
+reward_tid = 4
+unlock_level = 5
+
+
+type_t = Type_Plant
+index = 6
+version = DALU
+item_name = AA
+item_level = 1
+ripe_time = 2
+consume_diamonds = 3
+reward_tid = 4
+unlock_level = 5
+
+

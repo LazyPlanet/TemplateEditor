@@ -1,0 +1,63 @@
+index = 1
+version = GLOBAL
+type_tid = 41
+name = 物理攻击
+value = 100
+
+
+index = 2
+version = GLOBAL
+type_tid = 42
+name = 法术攻击
+value = 101
+
+
+index = 3
+version = GLOBAL
+type_tid = 43
+name = 法术攻击
+value = 102
+
+
+index = 4
+version = GLOBAL
+type_tid = 44
+name = 法术攻击
+value = 103
+
+
+index = 5
+version = GLOBAL
+type_tid = 45
+name = 法术攻击
+value = 104
+
+
+index = 6
+version = GLOBAL
+type_tid = 46
+name = 法术攻击
+value = 105
+
+
+index = 7
+version = GLOBAL
+type_tid = 47
+name = 法术攻击
+value = 106
+
+
+index = 8
+version = GLOBAL
+type_tid = 48
+name = 法术攻击
+value = 107
+
+
+index = 9
+version = GLOBAL
+type_tid = 49
+name = 法术攻击
+value = 108
+
+
